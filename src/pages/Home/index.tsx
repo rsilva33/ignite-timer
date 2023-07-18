@@ -1,8 +1,9 @@
 import { Play } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-// so utilizar quando a biblioteca nao tiver um export default
 import * as zod from 'zod'
+import { useState, useEffect } from 'react'
+import { diferrenceInSeconds, differenceInSeconds } from 'date-fns'
 
 import {
   CountdownContainer,
@@ -14,7 +15,6 @@ import {
   TaskInput,
 } from './styles'
 
-// schema -> definir um formato e validar os dados do formulario com base nesse formato / validando um objeto
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Inform the task'),
   minutesAmount: zod
@@ -22,21 +22,23 @@ const newCycleFormValidationSchema = zod.object({
     .min(5, 'The cycle must be at least 5 minutes')
     .max(60, 'The cycle needs to be a maximum of 60 minutes'),
 })
-// Controlled -> manter em tempo real a informacao de input que o usuario prenche no estado atual guardado / Formulario simples com poucos campos
-// Uncontroled -> nao monitora o valor digitado em tempo real / dashboard com diversos campos de input
 
-// interface NewCycleFormData {
-//   task: string
-//   minutesAmount: number
-// }
-
-// nao pode utilizar uma variavel javascript direto no ts por isso e necessario converter utilizando typeof
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 
-export function Home() {
-  // register -> adiciona um input ao formulario
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+  startDate: Date
+}
 
-  const { register, handleSubmit, watch, reset } = useForm({
+export function Home() {
+  // sempre que for iniciar um estado informar o tipo
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
       task: '',
@@ -44,12 +46,45 @@ export function Home() {
     },
   })
 
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate),
+        )
+      }, 1000)
+    }
+  }, [activeCycle])
+
   function handleCreateNewCycle(data: NewCycleFormData) {
-    console.log(data)
+    const id = String(new Date().getTime())
+
+    const newCycle: Cycle = {
+      id,
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    }
+
+    setCycles((state) => [...state, newCycle])
+    setActiveCycleId(id)
+
     reset()
   }
 
-  // saber o o valor do campo de task em tempo real
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
+
+  const minutesAmount = Math.floor(currentSeconds / 60)
+  const secondsAmount = currentSeconds % 60
+
+  const minutes = String(minutesAmount).padStart(2, '0')
+  const seconds = String(secondsAmount).padStart(2, '0')
+
+  console.log(activeCycle)
+
   const task = watch('task')
   const isSubmitDisabled = !task
 
@@ -62,7 +97,6 @@ export function Home() {
             id="task"
             list="task-suggestions"
             placeholder="Name your project"
-            // pega todas as informacoes retornadas pelo register e acoplando no input
             {...register('task')}
           />
 
@@ -87,11 +121,11 @@ export function Home() {
         </FormContainer>
 
         <CountdownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdownContainer>
 
         <StartCountdownButton disabled={isSubmitDisabled} type="submit">
