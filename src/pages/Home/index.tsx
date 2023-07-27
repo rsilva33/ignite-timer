@@ -37,7 +37,6 @@ export function Home() {
 
   const { handleSubmit, watch, reset } = newCycleForm
 
-  // handle -> chama diretamente de um evento
   function handleCreateNewCycle(data: NewCycleFormData) {
     createNewCycle(data)
     reset()
@@ -51,8 +50,6 @@ export function Home() {
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
-        {/* React ES6 Spread Operator - pega as propriedades do objeto e passa como propriedade para o componente newCycleForm */}
-        {/* A forma principal de comunicacao dos componentes do react e atraves de propriedades, contexto somente quando tiver muitas propriedades */}
         <FormProvider {...newCycleForm}>
           <NewCycleForm />
         </FormProvider>

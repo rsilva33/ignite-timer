@@ -7,7 +7,6 @@ import {
 } from 'react'
 import { Cycle, cyclesReducer } from '../reducers/cycles/reducer'
 import {
-  ActionTypes,
   addNewCycleAction,
   interruptCurrentCycleAction,
   markCurrentCyclesAsFinishedAction,
@@ -40,8 +39,6 @@ interface CyclesContextProviderProps {
 export function CyclesContextProvider({
   children,
 }: CyclesContextProviderProps) {
-  // sempre que for iniciar um estado informar o tipo
-  // useReducer utiliza quando tem um estado complexo
   const [cyclesState, dispatch] = useReducer(
     cyclesReducer,
     {
@@ -49,7 +46,6 @@ export function CyclesContextProvider({
       activeCycleId: null,
     },
     (initialState) => {
-      // se o usuario nao tiver nada no storage ele vai retornar o valos do segundo parametro como valor inicial para o reducer e nao vai dar erro
       const storedStateAsJSON = localStorage.getItem(
         '@ignite-timer:cycles-state-1.0.0',
       )

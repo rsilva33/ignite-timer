@@ -27,7 +27,6 @@ export function cyclesReducer(state: CyclesState, action: any) {
         return cycle.id === state.activeCycleId
       })
 
-      // FindIndex quando nao encontra um ciclo ativo, ele retorna -1 (nao modifica nada)
       if (currentCycleIndex < 0) {
         return state
       }

@@ -15,15 +15,12 @@ export const HistoryContainer = styled.main`
 
 export const HistoryList = styled.div`
   flex: 1;
-  /* se o tamanho da tabela for maior do que o container disponivel gere uma barra de rolagem */
   overflow: auto;
   margin-top: 2rem;
 
   table {
     width: 100%;
-    /* pega apenas uma borda entre os elementos */
     border-collapse: collapse;
-    /* forca quando tiver um tamanho menor gere o scroll */
     min-width: 600px;
 
     th {
@@ -69,7 +66,6 @@ const STATUS_COLORS = {
   green: 'green-500',
   red: 'red-500',
 } as const
-// as const - os componentes deixa de ser uma string e se torna  tipo especifico
 
 interface StatusProps {
   statusColor: keyof typeof STATUS_COLORS

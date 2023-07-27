@@ -21,7 +21,6 @@ export function Countdown() {
       interval = setInterval(() => {
         const secondsDifference = differenceInSeconds(
           new Date(),
-          // Se for uma string converte em um Date
           new Date(activeCycle.startDate),
         )
 
